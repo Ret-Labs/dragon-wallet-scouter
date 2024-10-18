@@ -1,5 +1,4 @@
 from Dragon import utils, BundleFinder, ScanAllTx, BulkWalletChecker, TopTraders, TimestampTransactions, purgeFiles, CopyTradeWalletFinder, TopHolders, checkProxyFile
-from Dragon import TronTopTraders, TronBulkWalletChecker, TronTimestampTransactions
 from Dragon import EthBulkWalletChecker, EthTopTraders, EthTimestampTransactions, EthScanAllTx
 
 purgeFiles = utils.purgeFiles
