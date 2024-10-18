@@ -8,7 +8,7 @@ import time
 
 ua = UserAgent(os='linux', browsers=['firefox'])
 
-class BulkWalletChecker:
+class CustomBulkWalletCheckerWithConfig:
 
     def __init__(self):
         self.sendRequest = tls_client.Session(client_identifier='chrome_103')
