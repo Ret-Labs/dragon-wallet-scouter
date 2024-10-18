@@ -4,6 +4,7 @@ from Dragon.traders import TopTraders
 from Dragon.holders import TopHolders
 from Dragon.bundle import BundleFinder
 from Dragon.wallet import BulkWalletChecker
+from Dragon.customWallet import CustomBulkWalletCheckerWithConfig
 from Dragon.timestamp import TimestampTransactions
 from Dragon.copyWalletFinder import CopyTradeWalletFinder
 from Dragon.ethWallet import EthBulkWalletChecker
