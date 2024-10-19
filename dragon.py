@@ -289,20 +289,9 @@ def solana():
                             break
                         break
 
-                    while True:
-                        skipWallets = False
-                        skipWalletsInput = input("[❓] Skip wallets with no buys in 30d (Y/N) > ")
-
-                        if skipWalletsInput.upper() not in ["Y", "N"]:
-                            print("[🐲] Invalid input.")
-                            continue 
-                        if skipWalletsInput.upper() == "N":
-                            skipWallets = False
-                        else:
-                            skipWallets = True
-                        walletData = customWalletCheckWithConfig.fetchWalletData(wallets, threads=threads, skipWallets=skipWallets, useProxies=useProxies)
-                        print(f"\n{optionsChoice}\n")
-                        break  
+                    skipWallets = False
+                    walletData = customWalletCheckWithConfig.fetchWalletData(wallets, threads=threads, skipWallets=skipWallets, useProxies=useProxies)
+                    print(f"\n{optionsChoice}\n")
 
                 except IndexError as e:
                     print("[🐲] File choice out of range.")
