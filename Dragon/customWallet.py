@@ -5,18 +5,24 @@ import cloudscraper
 from fake_useragent import UserAgent
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
+import yaml
 
 ua = UserAgent(os='linux', browsers=['firefox'])
 
 class CustomBulkWalletCheckerWithConfig:
 
-    def __init__(self):
+    def __init__(self, config_file='config.yaml'):
         self.sendRequest = tls_client.Session(client_identifier='chrome_103')
         self.cloudScraper = cloudscraper.create_scraper()
         self.shorten = lambda s: f"{s[:4]}...{s[-5:]}" if len(s) >= 9 else s
         self.skippedWallets = 0
         self.proxyPosition = 0
         self.results = []
+        self.config = self.loadConfig(config_file)
+
+    def loadConfig(self, config_file):
+        with open(config_file, 'r') as file:
+            return yaml.safe_load(file)
 
     def loadProxies(self):
         with open("Dragon/data/Proxies/proxies.txt", 'r') as file:
@@ -57,7 +63,28 @@ class CustomBulkWalletCheckerWithConfig:
         self.proxyPosition += 1
         return proxy
 
-    
+    def filterWalletData(self, data):
+        min_winrate = self.config['filters']['min_winrate']
+        min_pnl = self.config['filters']['min_pnl']
+        min_tokens_traded = self.config['filters']['min_tokens_traded']
+        max_tokens_traded = self.config['filters']['max_tokens_traded']
+
+        # Switch between 7-day or 30-day data based on config
+        if self.config['filters'].get('use_30d_data', False):
+            winrate = (data.get('winrate') or 0) * 100
+            pnl = (data.get('pnl_30d') or 0) * 100
+            tokens_traded = data.get('token_num') or 0
+        else:
+            winrate = (data.get('winrate') or 0) * 100
+            pnl = (data.get('pnl_7d') or 0) * 100
+            tokens_traded = data.get('token_num') or 0
+
+        if (winrate >= min_winrate and pnl >= min_pnl and 
+            min_tokens_traded <= tokens_traded <= max_tokens_traded):
+            return True
+        return False
+
+
     def getTokenDistro(self, wallet: str, useProxies):
         url = f"https://gmgn.ai/defi/quotation/v1/rank/sol/wallets/{wallet}/unique_token_7d?interval=30d"
         headers = {
@@ -189,6 +216,8 @@ class CustomBulkWalletCheckerWithConfig:
 
     
     def processWalletData(self, wallet, data, headers, useProxies):
+        print(f"[🐲] Processing data for wallet {wallet}")
+
         direct_link = f"https://gmgn.ai/sol/address/{wallet}"
         total_profit_percent = f"{data['total_profit_pnl'] * 100:.2f}%" if data['total_profit_pnl'] is not None else "error"
         realized_profit_7d_usd = f"${data['realized_profit_7d']:,.2f}" if data['realized_profit_7d'] is not None else "error"
@@ -226,6 +255,12 @@ class CustomBulkWalletCheckerWithConfig:
                 "directLink": direct_link
             }
 
+        if self.config['filters'].get('use_30d_data', False):
+            if not self.filterWalletData(winrate_30data):
+                return None
+        elif not self.filterWalletData(data):
+            return None
+
         tokenDistro = self.getTokenDistro(wallet, useProxies)
 
         try:
@@ -246,7 +281,7 @@ class CustomBulkWalletCheckerWithConfig:
             "directLink": direct_link,
             "buy_7d": buy_7d
         }
-    
+
     def fetchWalletData(self, wallets, threads, skipWallets, useProxies):
         with ThreadPoolExecutor(max_workers=threads) as executor:
             futures = {executor.submit(self.getWalletData, wallet.strip(), skipWallets, useProxies): wallet for wallet in wallets}
