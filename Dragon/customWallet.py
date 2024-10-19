@@ -256,11 +256,13 @@ class CustomBulkWalletCheckerWithConfig:
                 "directLink": direct_link
             }
 
+        if self.config['filters'].get('use_7d_data', False):
+            if not self.filterWalletData(data):
+                return None
+
         if self.config['filters'].get('use_30d_data', False):
             if not self.filterWalletData(winrate_30data):
                 return None
-        elif not self.filterWalletData(data):
-            return None
 
         tokenDistro = self.getTokenDistro(wallet, useProxies)
         token_num_7d = f"{data['token_num']}" if data['token_num'] is not None else "?"
