@@ -222,9 +222,10 @@ class CustomBulkWalletCheckerWithConfig:
         total_profit_percent = f"{data['total_profit_pnl'] * 100:.2f}%" if data['total_profit_pnl'] is not None else "error"
         realized_profit_7d_usd = f"${data['realized_profit_7d']:,.2f}" if data['realized_profit_7d'] is not None else "error"
         realized_profit_30d_usd = f"${data['realized_profit_30d']:,.2f}" if data['realized_profit_30d'] is not None else "error"
+        pnl_7d = f"{data['pnl_7d'] * 100:.2f}%" if data['pnl_7d'] is not None else "?"
+        pnl_30d = f"{data['pnl_30d'] * 100:.2f}%" if data['pnl_30d'] is not None else "?"
         winrate_7d = f"{data['winrate'] * 100:.2f}%" if data['winrate'] is not None else "?"
         sol_balance = f"{float(data['sol_balance']):.2f}" if data['sol_balance'] is not None else "?"
-        buy_7d = f"{data['buy_7d']}" if data['buy_7d'] is not None else "?"
 
         try:
             winrate_30data = self.sendRequest.get(
@@ -262,6 +263,8 @@ class CustomBulkWalletCheckerWithConfig:
             return None
 
         tokenDistro = self.getTokenDistro(wallet, useProxies)
+        token_num_7d = f"{data['token_num']}" if data['token_num'] is not None else "?"
+        token_num_30d = f"{winrate_30data['token_num']}" if winrate_30data['token_num'] is not None else "?"
 
         try:
             tags = data['tags']
@@ -279,7 +282,10 @@ class CustomBulkWalletCheckerWithConfig:
             "sol_balance": sol_balance,
             "token_distribution": tokenDistro if tokenDistro else {},
             "directLink": direct_link,
-            "buy_7d": buy_7d
+            "token_num_7d": token_num_7d,
+            "token_num_30d": token_num_30d,
+            "pnl_7d": pnl_7d,
+            "pnl_30d": pnl_30d
         }
 
     def fetchWalletData(self, wallets, threads, skipWallets, useProxies):
