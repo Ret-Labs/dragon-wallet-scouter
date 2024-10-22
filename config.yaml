@@ -1,7 +1,7 @@
 filters:
-  min_winrate: 50
-  min_pnl: 50
-  min_tokens_traded: 1
+  min_winrate: 10
+  min_pnl: 100
+  min_tokens_traded: 5
   max_tokens_traded: 100000
 
   # if both are true it will filter based on both 7d and 30d data
