@@ -315,7 +315,7 @@ class CustomBulkWalletCheckerWithConfig:
         identifier = self.shorten(list(result_dict)[0])
         filename = f"{identifier}_{random.randint(1111, 9999)}.csv"
 
-        path = f"Dragon/data/Solana/BulkWallet/wallets_{filename}"
+        path = f"Dragon/data/Solana/BulkWalletCustom/wallets_{filename}"
 
         with open(path, 'w', newline='') as outfile:
             writer = csv.writer(outfile)
